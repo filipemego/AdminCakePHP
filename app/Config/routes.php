@@ -28,7 +28,56 @@
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
  */
-	Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'display'));
+	foreach(scandir('../View/Pages') as $path){
+		if (is_dir('../View/Pages/' . $path)) {
+			foreach(scandir('../View/Pages/' . $path) as $subPath){
+				if(pathinfo($subPath, PATHINFO_EXTENSION) == "ctp"){
+					$name = pathinfo($subPath, PATHINFO_FILENAME);
+					Router::connect('/' . $path . '/' .$name, array('controller' => 'pages', 'action' => 'display', $path . '/' . $name));
+				}
+			}
+		} else {
+			if(pathinfo($path, PATHINFO_EXTENSION) == "ctp"){
+				$name = pathinfo($path, PATHINFO_FILENAME);
+				Router::connect('/'.$name, array('controller' => 'pages', 'action' => 'display', $name));
+			}
+		}
+	}
+
+	Router::connect(
+		'/:prefix',
+		array(
+			'controller' => 'pages',
+			'action' => 'display',
+			'home',
+			'prefix' => 'admin',
+			'admin' => true,
+		),
+		array(
+			'prefix' => '(?i:admin)'
+		)
+	);
+
+	Router::connect(
+		'/:prefix/',
+		array(
+			'controller' => 'pages',
+			'action' => 'display',
+			'home',
+			'prefix' => 'admin',
+			'admin' => true,
+		),
+		array(
+			'prefix' => '(?i:admin)'
+		)
+	);
+
+	Router::connect('/:prefix/login', array('controller' => 'users', 'action' => 'login', 'prefix' => 'admin', 'admin' => true));
+	Router::connect('/:prefix/logout', array('controller' => 'users', 'action' => 'logout', 'prefix' => 'admin', 'admin' => true));
+	
+
+	Router::mapResources('fotos');
+	Router::parseExtensions('json');
 
 /**
  * Load all plugin routes. See the CakePlugin documentation on

@@ -18,21 +18,21 @@ class UsersController extends AppController {
 	public function beforeFilter() {
 	    parent::beforeFilter();
 
-	    // For CakePHP 2.1 and up
-	    $this->Auth->allow();
+	    $this->Auth->allow('admin_login', 'admin_logout', 'admin_initDB');
 	}
 
 	public function admin_login() {
+		$this->layout = 'admin_blank';
 	    if ($this->request->is('post')) {
 	        if ($this->Auth->login()) {
 	            return $this->redirect($this->Auth->redirect());
 	        }
-	        $this->Session->setFlash(__('Your username or password was incorrect.'));
+	        $this->Session->setFlash('Usuário ou senha incorretos');
 	    }
 	}
 
 	public function admin_logout() {
-	    //Leave empty for now.
+		$this->redirect($this->Auth->logout());
 	}
 
 /**
@@ -124,5 +124,17 @@ class UsersController extends AppController {
 			$this->Session->setFlash(__('The user could not be deleted. Please, try again.'));
 		}
 		return $this->redirect(array('action' => 'index'));
+	}
+
+	public function admin_initDB() {
+ 	    $group = $this->User->Group;
+
+	    // Allow admins to everything
+	    $group->id = 1;
+	    $this->Acl->allow($group, 'controllers');
+
+	    // we add an exit to avoid an ugly "missing views" error message
+	    echo "all done";
+	    exit;
 	}
 }

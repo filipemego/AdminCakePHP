@@ -32,33 +32,41 @@ App::uses('Controller', 'Controller');
  */
 class AppController extends Controller {
 
-    public $components = array(
-    	'DebugKit.Toolbar',
-        'Acl',
-        'Auth' => array(
-            'authorize' => array(
-                'Actions' => array('actionPath' => 'controllers')
-            )
-        ),
-        'Session'
-    );
-    
-    public $helpers = array('Html', 'Form', 'Session');
+	public $components = array(
+		'DebugKit.Toolbar',
+		'Acl',
+		'Auth' => array(
+			'authorize' => array(
+				'Actions' => array('actionPath' => 'controllers')
+			)
+		),
+		'Session'
+	);
 
-    public function beforeFilter() {
-        //Configure AuthComponent
-        $this->Auth->loginAction = array(
-          'controller' => 'users',
-          'action' => 'login'
-        );
-        $this->Auth->logoutRedirect = array(
-          'controller' => 'users',
-          'action' => 'login'
-        );
-        $this->Auth->loginRedirect = array(
-          'controller' => 'posts',
-          'action' => 'add'
-        );
-    }
-	
+	public $helpers = array('Html', 'Form', 'Session');
+
+	public function beforeFilter() {
+		Configure::write('Config.language', 'por');
+
+		// Configura admin route
+		if ((isset($this->params['prefix']) && ($this->params['prefix'] == 'admin'))) {
+			$this->layout = 'admin';
+		} else {
+			$this->Auth->allow();
+		}
+
+		//Configure AuthComponent
+		$this->Auth->loginAction = array(
+			'controller' => 'users',
+			'action' => 'login'
+		);
+		$this->Auth->logoutRedirect = array(
+			'controller' => 'users',
+			'action' => 'login'
+		);
+		$this->Auth->loginRedirect = array(
+			'controller' => 'posts',
+			'action' => 'add'
+		);
+	}
 }
